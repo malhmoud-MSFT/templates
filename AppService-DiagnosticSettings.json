@@ -1,0 +1,116 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServiceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appHostingPlanNameVar": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanSkuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "diagnosticSettingName01": {
+        "type": "string",
+        "minLength": 1
+      }
+  },
+  "resources": [
+    {
+      "name": "[parameters('appHostingPlanNameVar')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('appServicePlanSkuName')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "appServicePlan"
+      },
+      "properties": {
+        "name": "[parameters('appHostingPlanNameVar')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "name": "[parameters('appServiceName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appHostingPlanNameVar'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('appHostingPlanNameVar')))]": "Resource",
+        "displayName": "webApp"
+      },
+      "properties": {
+        "name": "[parameters('appServiceName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appHostingPlanNameVar'))]"
+      },
+      "resources": [
+        {
+          "type": "providers/diagnosticSettings",
+          "name": "[concat('Microsoft.Insights/', parameters('diagnosticSettingName01'))]",
+          "apiVersion": "2017-05-01-preview",
+          "properties": {
+            "name": "[parameters('diagnosticSettingName01')]",
+            "storageAccountId":null,
+            "eventHubAuthorizationRuleId": null,
+            "eventHubName": null,
+            "workspaceId": "/subscriptions/6bf06ce0-fa3a-4d7c-a31d-58fe1663d176/resourcegroups/ServiceBusRG/providers/Microsoft.OperationalInsights/workspaces/omsmalhmoud",
+            "metrics": [
+                {
+                  "category": "AllMetrics",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "enabled": true,
+                    "days": 15
+                  }
+                }
+              ],
+              "logs": [ 
+                {
+                  "category": "FunctionExecutionLogs",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "days": 5,
+                    "enabled": true
+                  }
+                }
+              ]           
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
+          ]
+        }
+    ]
+}]
+}
