@@ -1,7 +1,5 @@
-# templates
+<h2> Templates </h2>
 
+This section contains ARM templates that are reusable and you can deploy them directly from Azure.
 
-Deploy App Service with Diagnostic Settings:
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmalhmoud-MSFT%2Ftemplates%2Fmaster%2FAppService-DiagnosticSettings.json " target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
-</a>
+Head to any ARM Template you need and deploy directly through Github.
