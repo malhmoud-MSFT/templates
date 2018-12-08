@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "hubName": {
+        "type": "string"
+      },
+      "diagnosticSettingName01": {
+        "type": "string"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Devices/IotHubs",
+        "sku": {
+            "name": "S1",
+            "tier": "Standard",
+            "capacity": 1
+        },
+        "name": "[parameters('hubName')]",
+        "apiVersion": "2016-02-03",
+        "location": "West Europe",
+        "properties": {
+            "location": "West Europe"
+        },
+        "resources": [
+          {
+            "type": "providers/diagnosticSettings",
+            "name": "[concat('Microsoft.Insights/', parameters('diagnosticSettingName01'))]",
+            "apiVersion": "2017-05-01-preview",
+            "properties": {
+              "name": "[parameters('diagnosticSettingName01')]",
+              "storageAccountId":null,
+              "eventHubAuthorizationRuleId": null,
+              "eventHubName": null,
+              "workspaceId": "/subscriptions/6bf06ce0-fa3a-4d7c-a31d-58fe1663d176/resourcegroups/ServiceBusRG/providers/Microsoft.OperationalInsights/workspaces/omsmalhmoud",
+              "logs": [
+                {
+                  "category": "Connections",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "days": 15,
+                    "enabled": true
+                  }
+                }
+              ]
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.Devices/IotHubs', parameters('hubName'))]"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  
+  
